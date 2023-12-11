@@ -3,13 +3,15 @@ const User = require('../models/User');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
+require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
-	User.find()
+	User.find({})
 		.select('_id firstName email date')
 		.exec()
 		.then((users) => {
-			if (users.length <= 1) {
+			if (users.length < 1) {
 				return res.status(404).json({
 					error: { message: 'No user found' },
 				});
@@ -68,7 +70,12 @@ exports.registerUser = (req, res, next) => {
 	//Find exist Email
 	User.find({ email: req.body.email })
 		.then((user) => {
-			if (user.length === 0) {
+			if (user.length === 0 && req.body.email && req.body.password && req.body.firstName) {
+				if (!validator.isEmail(req.body.email)) {
+					return res.status(422).json({
+						error: { message: 'This is not a valid email' },
+					});
+				}
 				//ENCODE password
 				bcrypt.hash(req.body.password, 10, (err, hash) => {
 					if (err) {
@@ -82,20 +89,29 @@ exports.registerUser = (req, res, next) => {
 							email: req.body.email,
 							password: hash,
 						});
+						jwt.sign(
+							{ ...users },
+							process.env.JWT_SECRET_KEY,
+							{ algorithm: 'HS256' },
+							function (err, token) {
+								console.log(token);
+							}
+						);
 						users.save().then((result) => {
 							return res.status(201).json({ User: result });
 						});
 					}
 				});
-				return res.status(422).json({
-					error: {
-						message: 'Parameters dont meet requirement',
-					},
-				});
 			} else {
-				return res.status(409).json({
-					error: { message: 'Existed' },
-				});
+				if (user.length === 1) {
+					return res.status(409).json({
+						error: { message: 'Existed' },
+					});
+				} else {
+					return res.status(422).json({
+						error: { message: 'Fields required' },
+					});
+				}
 			}
 		})
 		.catch((err) => {
@@ -108,6 +124,11 @@ exports.registerUser = (req, res, next) => {
 exports.deleteAll = (req, res, next) => {
 	User.find({})
 		.deleteMany()
+		.then((response) => {
+			return res.status(200).json({
+				data: { message: 'Delete successfully' },
+			});
+		})
 		.catch((err) => {
 			return res.status(500).json({
 				error: { message: err.message },
@@ -116,7 +137,9 @@ exports.deleteAll = (req, res, next) => {
 };
 
 exports.changeInfo = (req, res, next) => {
-	User.findOneAndUpdate({ email: req.userData.email }, req.body)
+	User.findOneAndUpdate({ email: req.userData.email }, req.body, {
+		new: true,
+	})
 		.then((result) => {
 			return res.status(200).json({
 				data: result,
@@ -132,6 +155,7 @@ exports.changeInfo = (req, res, next) => {
 };
 
 exports.getInfo = (req, res, next) => {
+	console.log(req.userData.email);
 	User.find({ email: req.userData.email })
 		.then((result) => {
 			return res.status(200).json({
