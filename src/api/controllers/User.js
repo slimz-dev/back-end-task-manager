@@ -25,7 +25,7 @@ exports.getAllUser = (req, res, next) => {
 };
 
 exports.loginUser = (req, res, next) => {
-	User.find({ email: req.body.email })
+	User.find({ $or: [{ email: req.body.email }, { userName: req.body.userName }] })
 		.then((user) => {
 			if (user.length === 1) {
 				bcrypt.compare(req.body.password, user[0].password, (err, result) => {
