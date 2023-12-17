@@ -8,7 +8,7 @@ require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
 	User.find({})
-		.select('_id firstName email date')
+		.select('_id firstName lastName email img biography')
 		.exec()
 		.then((users) => {
 			if (users.length < 1) {
@@ -17,7 +17,10 @@ exports.getAllUser = (req, res, next) => {
 				});
 			} else {
 				return res.status(200).json({
-					Users: users,
+					data: users,
+					meta: {
+						numbers: users.length,
+					},
 				});
 			}
 		})
@@ -137,7 +140,13 @@ exports.deleteAll = (req, res, next) => {
 };
 
 exports.changeInfo = (req, res, next) => {
-	User.findOneAndUpdate({ email: req.userData.email }, req.body, {
+	const updateInfo = req.body;
+	const phoneNumber = updateInfo.phone;
+	if (phoneNumber && !validator.isMobilePhone(phoneNumber, ['vi-VN'])) {
+		delete updateInfo.phone;
+		console.log('wrong phone');
+	}
+	User.findOneAndUpdate({ email: req.userData.email }, updateInfo, {
 		new: true,
 	})
 		.then((result) => {
