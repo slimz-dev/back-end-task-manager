@@ -7,7 +7,6 @@ const userSchema = mongoose.Schema({
 	biography: { type: String },
 	phone: { type: String },
 	address: { type: String },
-	img: { type: String },
 	email: {
 		type: String,
 		unique: true,
@@ -15,6 +14,7 @@ const userSchema = mongoose.Schema({
 	secondEmail: {
 		type: String,
 	},
+	img: { type: String },
 	password: { type: String },
 	date: { type: Date, default: Date.now },
 });

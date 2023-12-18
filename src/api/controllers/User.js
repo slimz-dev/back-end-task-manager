@@ -8,7 +8,7 @@ require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
 	User.find({})
-		.select('_id firstName lastName email img biography')
+		.select('_id firstName lastName email img biography phone')
 		.exec()
 		.then((users) => {
 			if (users.length < 1) {
@@ -28,23 +28,23 @@ exports.getAllUser = (req, res, next) => {
 };
 
 exports.loginUser = (req, res, next) => {
-	User.find({ $or: [{ email: req.body.email }, { userName: req.body.userName }] })
+	const { email, userName, password } = req.body;
+	const account = email ? email : userName;
+	const field = email === undefined ? 'userName' : 'email';
+	User.find({ [field]: account })
 		.then((user) => {
+			console.log(field, account);
 			if (user.length === 1) {
-				bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+				bcrypt.compare(password, user[0].password, (err, result) => {
 					if (err) {
 						return res.status(401).json({
 							error: { message: err.message },
 						});
 					}
 					if (result) {
-						const token = jwt.sign(
-							{
-								email: user[0].email,
-								firstName: user[0].firstName,
-							},
-							process.env.JWT_SECRET_KEY
-						);
+						const token = jwt.sign({ id: user[0].id }, process.env.JWT_SECRET_KEY, {
+							algorithm: 'HS256',
+						});
 						return res.status(200).json({
 							data: {
 								message: 'Login successfully',
@@ -92,14 +92,6 @@ exports.registerUser = (req, res, next) => {
 							email: req.body.email,
 							password: hash,
 						});
-						jwt.sign(
-							{ ...users },
-							process.env.JWT_SECRET_KEY,
-							{ algorithm: 'HS256' },
-							function (err, token) {
-								console.log(token);
-							}
-						);
 						users.save().then((result) => {
 							return res.status(201).json({ User: result });
 						});
@@ -140,13 +132,14 @@ exports.deleteAll = (req, res, next) => {
 };
 
 exports.changeInfo = (req, res, next) => {
+	const { id } = req.userData;
 	const updateInfo = req.body;
 	const phoneNumber = updateInfo.phone;
 	if (phoneNumber && !validator.isMobilePhone(phoneNumber, ['vi-VN'])) {
 		delete updateInfo.phone;
 		console.log('wrong phone');
 	}
-	User.findOneAndUpdate({ email: req.userData.email }, updateInfo, {
+	User.findOneAndUpdate({ _id: id }, updateInfo, {
 		new: true,
 	})
 		.then((result) => {
@@ -164,8 +157,9 @@ exports.changeInfo = (req, res, next) => {
 };
 
 exports.getInfo = (req, res, next) => {
-	console.log(req.userData.email);
-	User.find({ email: req.userData.email })
+	const { id } = req.userData;
+	User.find({ _id: id })
+		.select('firstName lastName email img biography phone userName')
 		.then((result) => {
 			return res.status(200).json({
 				data: result,
@@ -181,7 +175,8 @@ exports.getInfo = (req, res, next) => {
 };
 
 exports.deleteMe = (req, res, next) => {
-	User.deleteOne({ email: req.userData.email })
+	const { id } = req.userData.id;
+	User.deleteOne({ _id: id })
 		.then((result) => {
 			return res.status(200).json({
 				data: result,
