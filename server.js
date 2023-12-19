@@ -19,7 +19,7 @@ const mongoose = require('./src/config/db');
 mongoose.connect();
 
 //HTTP request
-app.use(morgan('combined'));
+// app.use(morgan('combined'));
 
 //Parser
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
@@ -53,7 +53,9 @@ app.use((error, req, res, next) => {
 });
 
 io.on('connection', (socket) => {
-	console.log('a user connected');
+	socket.on('login', (data) => {
+		console.log(data);
+	});
 });
 
 server.listen(port, () => {
