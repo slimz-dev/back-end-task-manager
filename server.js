@@ -14,6 +14,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const userRoutes = require('./src/api/routes/User');
 const mongoose = require('./src/config/db');
+const User = require('./src/api/models/User');
 
 //connect db
 mongoose.connect();
@@ -52,9 +53,55 @@ app.use((error, req, res, next) => {
 	});
 });
 
+let userState = [];
+User.find({})
+	.then((userList) => {
+		userList.map((user) => {
+			return userState.push({
+				state: false,
+				id: user._id.toString(),
+			});
+		});
+	})
+	.catch((error) => {
+		console.log('error catching user');
+	});
+
+function handleCatchingState(id, state) {
+	userState = userState.map((user) => {
+		if (user.id === id) {
+			return {
+				state,
+				id,
+			};
+		} else {
+			return {
+				state: user.state,
+				id: user.id,
+			};
+		}
+	});
+	return userState;
+}
 io.on('connection', (socket) => {
-	socket.on('login', (data) => {
-		console.log(data);
+	socket.emit('online', userState);
+	socket.on('connect', () => {
+		console.log('connected');
+	});
+	socket.on('connect_error', () => {
+		console.log('error connecting to server');
+	});
+	socket.on('login', (id) => {
+		console.log(`user ${id} logged in`);
+		socket.emit('online', handleCatchingState(id, true));
+	});
+	socket.on('disconnect', (id) => {
+		console.log('disconnected');
+		socket.emit('offline', handleCatchingState(id, false));
+	});
+	socket.on('logout', (id) => {
+		console.log(`${id} logged out`);
+		socket.emit('offline', handleCatchingState(id, false));
 	});
 });
 

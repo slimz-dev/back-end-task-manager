@@ -33,7 +33,6 @@ exports.loginUser = (req, res, next) => {
 	const field = email === undefined ? 'userName' : 'email';
 	User.find({ [field]: account })
 		.then((user) => {
-			console.log(field, account);
 			if (user.length === 1) {
 				bcrypt.compare(password, user[0].password, (err, result) => {
 					if (err) {
