@@ -189,3 +189,55 @@ exports.deleteMe = (req, res, next) => {
 			});
 		});
 };
+
+exports.changePassword = (req, res, next) => {
+	const { id } = req.userData;
+	const { password, newPassword } = req.body;
+	User.find({ _id: id })
+		.then((user) => {
+			const passwordCompare = bcrypt.compare(password, user[0].password, (error, result) => {
+				if (result) {
+					bcrypt.hash(newPassword, 10, (err, hash) => {
+						if (err) {
+							return res.status(500).json({
+								error: { message: err.message },
+							});
+						} else {
+							const updateInfo = {
+								password: hash,
+							};
+							User.findOneAndUpdate({ _id: id }, updateInfo, {
+								new: true,
+							})
+								.then((user) => {
+									return res.status(200).json({
+										data: user,
+									});
+								})
+								.catch((error) => {
+									return res.status(500).json({
+										error: {
+											message: error.message,
+										},
+									});
+								});
+						}
+					});
+				} else {
+					return res.status(401).json({
+						error: { message: 'Wrong password' },
+					});
+				}
+				if (error) {
+					return res.status(422).json({
+						error: { message: error.message },
+					});
+				}
+			});
+		})
+		.catch((error) => {
+			return res.status(500).json({
+				error: { message: error.message },
+			});
+		});
+};

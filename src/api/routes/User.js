@@ -19,6 +19,7 @@ router.get('/me', tokenVerify, userController.getInfo);
 
 // PATCH user
 router.patch('/me', tokenVerify, userController.changeInfo);
+router.patch('/me/password', tokenVerify, userController.changePassword);
 
 // DELETE 1 user
 router.delete('/me', tokenVerify, userController.deleteMe);
