@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 async function connect() {
 	try {
-		await mongoose.connect('mongodb://localhost:27017/task_management_dev', {
+		await mongoose.connect('mongodb+srv://slimz:123@taskmanagement.2h8fmwv.mongodb.net/', {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		});
