@@ -7,9 +7,7 @@ async function connect() {
 			useUnifiedTopology: true,
 		});
 		console.log('success');
-	} catch (error) {
-		console.log(e);
-	}
+	} catch (error) {}
 }
 
 module.exports = { connect };
