@@ -9,6 +9,7 @@ module.exports = (req, res, next) => {
 		next();
 	} catch {
 		(err) => {
+			console.log('wrong');
 			return res.status(401).json({
 				error: {
 					message: 'Authenticate failed',

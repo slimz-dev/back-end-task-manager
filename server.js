@@ -1,21 +1,31 @@
 const express = require('express');
 const port = 3001;
-const path = require('path');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require('socket.io');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const app = express();
 const userRoutes = require('./src/api/routes/User');
 const mongoose = require('./src/config/db');
 
+const io = new Server(server, {
+	cors: {
+		origin: 'http://localhost:3000',
+	},
+});
+
+exports.io = io;
+const socketHandler = require('./socket');
 //connect db
 mongoose.connect();
 
 //HTTP request
-app.use(morgan('combined'));
+// app.use(morgan('combined'));
 
 //Parser
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
@@ -44,6 +54,7 @@ app.use((error, req, res, next) => {
 	});
 });
 
-app.listen(port, () => {
+io.on('connection', socketHandler);
+server.listen(port, () => {
 	console.log(`Example app listening on port ${port}`);
 });
