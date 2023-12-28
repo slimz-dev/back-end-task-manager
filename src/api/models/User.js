@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const userSchema = mongoose.Schema({
 	_id: mongoose.Schema.Types.ObjectId,
+	role: { type: String, default: 'Nhân viên' },
+	department: { type: String, default: 'xxx' },
 	userName: { type: String },
 	firstName: { type: String },
 	lastName: { type: String },

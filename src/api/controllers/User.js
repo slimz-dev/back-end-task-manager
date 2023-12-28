@@ -8,6 +8,32 @@ require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
 	User.find({})
+		.select('_id firstName lastName email img biography phone role department')
+		.exec()
+		.then((users) => {
+			if (users.length < 1) {
+				return res.status(404).json({
+					error: { message: 'No user found' },
+				});
+			} else {
+				return res.status(200).json({
+					data: users,
+					meta: {
+						numbers: users.length,
+					},
+				});
+			}
+		})
+		.catch();
+};
+
+exports.getSearchUser = (req, res, next) => {
+	let { firstName, lastName, phone } = req.query;
+	if (!lastName) {
+		lastName = null;
+	}
+	User.find({ phone: phone })
+		.or([{ firstName: new RegExp(firstName, 'i') }, { lastName: new RegExp(lastName, 'i') }])
 		.select('_id firstName lastName email img biography phone')
 		.exec()
 		.then((users) => {
