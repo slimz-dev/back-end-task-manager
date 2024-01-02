@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const userSchema = mongoose.Schema({
 	_id: mongoose.Schema.Types.ObjectId,
-	role: { type: String, default: 'Nhân viên' },
+	role: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Group',
+	},
 	department: { type: String, default: 'xxx' },
 	userName: { type: String },
 	firstName: { type: String },

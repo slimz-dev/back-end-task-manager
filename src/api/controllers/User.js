@@ -1,5 +1,5 @@
-require('dotenv').config();
 const User = require('../models/User');
+const Group = require('../models/Group');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -8,6 +8,7 @@ require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
 	User.find({})
+		.populate('role', 'name')
 		.select('_id firstName lastName email img biography phone role department')
 		.exec()
 		.then((users) => {
@@ -111,14 +112,17 @@ exports.registerUser = (req, res, next) => {
 							error: { message: err.message },
 						});
 					} else {
-						const users = new User({
-							_id: new mongoose.Types.ObjectId(),
-							firstName: req.body.firstName,
-							email: req.body.email,
-							password: hash,
-						});
-						users.save().then((result) => {
-							return res.status(201).json({ User: result });
+						Group.find({ name: process.env.DEFAULT_ROLE }).then((group) => {
+							const users = new User({
+								_id: new mongoose.Types.ObjectId(),
+								firstName: req.body.firstName,
+								email: req.body.email,
+								password: hash,
+								role: group[0]._id,
+							});
+							users.save().then((result) => {
+								return res.status(201).json({ User: result });
+							});
 						});
 					}
 				});

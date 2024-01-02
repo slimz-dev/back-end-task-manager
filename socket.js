@@ -1,4 +1,5 @@
 const User = require('./src/api/models/User');
+const Group = require('./src/api/models/Group');
 const { io } = require('./server');
 
 let userState = [];
@@ -9,7 +10,6 @@ User.find({})
 			return userState.push({
 				state: false,
 				id: user._id.toString(),
-				tabsOpen: [],
 			});
 		});
 	})
@@ -71,6 +71,19 @@ const socketHandler = (socket) => {
 		}
 	});
 
+	socket.on('new_group', () => {
+		Group.find({}).then((group) => {
+			console.log(group);
+			io.sockets.emit('new_group_update', { groups: group });
+		});
+	});
+	socket.on('register', (data) => {
+		userState.push({
+			state: false,
+			id: data.User._id.toString(),
+		});
+		io.sockets.emit('user-state', userState);
+	});
 	socket.on('disconnect', () => {
 		//changing state if only 1 tab
 		if (isChangingState(socket.id)) {
