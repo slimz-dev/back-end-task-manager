@@ -43,71 +43,15 @@ exports.getGroup = (req, res, next) => {
 			});
 		});
 };
-exports.deleteTotal = (req, res, next) => {
-	let { firstName, lastName, phone } = req.query;
-	if (!lastName) {
-		lastName = null;
-	}
-	User.find({ phone: phone })
-		.or([{ firstName: new RegExp(firstName, 'i') }, { lastName: new RegExp(lastName, 'i') }])
-		.select('_id firstName lastName email img biography phone')
-		.exec()
-		.then((users) => {
-			if (users.length < 1) {
-				return res.status(404).json({
-					error: { message: 'No user found' },
-				});
-			} else {
-				return res.status(200).json({
-					data: users,
-					meta: {
-						numbers: users.length,
-					},
-				});
-			}
-		})
-		.catch();
-};
 
+//OK
 exports.deleteGroup = (req, res, next) => {
-	//Find exist Email
-	User.find({ email: req.body.email })
-		.then((user) => {
-			if (user.length === 0 && req.body.email && req.body.password && req.body.firstName) {
-				if (!validator.isEmail(req.body.email)) {
-					return res.status(422).json({
-						error: { message: 'This is not a valid email' },
-					});
-				}
-				//ENCODE password
-				bcrypt.hash(req.body.password, 10, (err, hash) => {
-					if (err) {
-						return res.status(500).json({
-							error: { message: err.message },
-						});
-					} else {
-						const users = new User({
-							_id: new mongoose.Types.ObjectId(),
-							firstName: req.body.firstName,
-							email: req.body.email,
-							password: hash,
-						});
-						users.save().then((result) => {
-							return res.status(201).json({ User: result });
-						});
-					}
-				});
-			} else {
-				if (user.length === 1) {
-					return res.status(409).json({
-						error: { message: 'Existed' },
-					});
-				} else {
-					return res.status(422).json({
-						error: { message: 'Fields required' },
-					});
-				}
-			}
+	const { id } = req.params;
+	Group.findOneAndDelete({ _id: id })
+		.then((response) => {
+			return res.status(200).json({
+				data: response,
+			});
 		})
 		.catch((err) => {
 			return res.status(500).json({
@@ -115,32 +59,31 @@ exports.deleteGroup = (req, res, next) => {
 			});
 		});
 };
+
+//OK
 exports.deleteMultipleGroup = (req, res, next) => {
-	const { id } = req.userData;
-	User.find({ _id: id })
-		.select('firstName lastName email img biography phone userName')
-		.then((result) => {
-			return res.status(200).json({
-				data: result,
-			});
-		})
-		.catch((err) => {
-			return res.status(500).json({
-				error: {
-					message: err.message,
-				},
-			});
+	const groupsDeleted = req.body;
+	groupsDeleted.forEach((group) => {
+		console.log('hi');
+		Group.findOneAndDelete({ _id: group }).then((response) => {
+			console.log(response);
 		});
+	});
+	return res.status(200).json({
+		data: 'Delete successfully !',
+	});
 };
 
+//OK
 exports.changeGroup = (req, res, next) => {
 	const updateGroup = req.body;
-	User.findOneAndUpdate({ name: 'Nhân viên' }, updateGroup, {
+	const { id } = req.params;
+	Group.findOneAndUpdate({ _id: id }, updateGroup, {
 		new: true,
 	})
 		.then((response) => {
 			return res.status(200).json({
-				data: { message: 'Delete successfully' },
+				data: response,
 			});
 		})
 		.catch((err) => {

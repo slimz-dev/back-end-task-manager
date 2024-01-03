@@ -73,7 +73,6 @@ const socketHandler = (socket) => {
 
 	socket.on('new_group', () => {
 		Group.find({}).then((group) => {
-			console.log(group);
 			io.sockets.emit('new_group_update', { groups: group });
 		});
 	});
