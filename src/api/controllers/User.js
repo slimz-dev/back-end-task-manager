@@ -9,6 +9,7 @@ require('dotenv').config();
 exports.getAllUser = (req, res, next) => {
 	User.find({})
 		.populate('role', 'name')
+		.populate('department', 'name')
 		.select('_id firstName lastName email img biography phone role department')
 		.exec()
 		.then((users) => {
@@ -168,6 +169,25 @@ exports.changeInfo = (req, res, next) => {
 		delete updateInfo.phone;
 		console.log('wrong phone');
 	}
+	User.findOneAndUpdate({ _id: id }, updateInfo, {
+		new: true,
+	})
+		.then((result) => {
+			return res.status(200).json({
+				data: result,
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				error: {
+					message: err.message,
+				},
+			});
+		});
+};
+exports.changeGroup = (req, res, next) => {
+	const { id } = req.params;
+	const updateInfo = req.body;
 	User.findOneAndUpdate({ _id: id }, updateInfo, {
 		new: true,
 	})

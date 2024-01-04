@@ -20,6 +20,7 @@ router.get('/me', tokenVerify, userController.getInfo);
 // PATCH user
 router.patch('/me', tokenVerify, userController.changeInfo);
 router.patch('/me/password', tokenVerify, userController.changePassword);
+router.patch('/assign/:id', tokenVerify, userController.changeGroup);
 
 // DELETE 1 user
 router.delete('/me', tokenVerify, userController.deleteMe);

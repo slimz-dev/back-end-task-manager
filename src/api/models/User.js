@@ -5,7 +5,7 @@ const userSchema = mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Group',
 	},
-	department: { type: String, default: 'xxx' },
+	department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
 	userName: { type: String },
 	firstName: { type: String },
 	lastName: { type: String },

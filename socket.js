@@ -1,5 +1,6 @@
 const User = require('./src/api/models/User');
 const Group = require('./src/api/models/Group');
+const Department = require('./src/api/models/Department');
 const { io } = require('./server');
 
 let userState = [];
@@ -74,6 +75,16 @@ const socketHandler = (socket) => {
 	socket.on('new_group', () => {
 		Group.find({}).then((group) => {
 			io.sockets.emit('new_group_update', { groups: group });
+		});
+	});
+	socket.on('new_department', () => {
+		Department.find({}).then((department) => {
+			io.sockets.emit('new_department_update', { departments: department });
+		});
+	});
+	socket.on('update_user_group', () => {
+		User.find({}).then((user) => {
+			io.sockets.emit('user_group_updated', { users: user });
 		});
 	});
 	socket.on('register', (data) => {

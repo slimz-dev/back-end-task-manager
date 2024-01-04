@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const userRoutes = require('./src/api/routes/User');
 const groupRoutes = require('./src/api/routes/Group');
+const departmentRoutes = require('./src/api/routes/Department');
 const mongoose = require('./src/config/db');
 
 const io = new Server(server, {
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/departments', departmentRoutes);
 app.use((req, res, next) => {
 	const error = new Error('Invalid');
 	error.status = 404;
