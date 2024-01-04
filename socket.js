@@ -83,9 +83,12 @@ const socketHandler = (socket) => {
 		});
 	});
 	socket.on('update_user_group', () => {
-		User.find({}).then((user) => {
-			io.sockets.emit('user_group_updated', { users: user });
-		});
+		User.find({})
+			.populate('role', 'name')
+			.populate('department', 'name')
+			.then((user) => {
+				io.sockets.emit('user_group_updated', { users: user });
+			});
 	});
 	socket.on('register', (data) => {
 		userState.push({
