@@ -4,6 +4,7 @@ const groupController = require('../controllers/Group');
 const tokenVerify = require('../middleware/tokenVerify');
 const permissionVerify = require('../middleware/permissionVerify');
 // GET total groups
+
 router.get('/', tokenVerify, permissionVerify, groupController.getTotalGroups);
 // DELETE multiple groups
 router.delete('/', tokenVerify, permissionVerify, groupController.deleteMultipleGroup);
