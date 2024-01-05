@@ -4,6 +4,7 @@ const userController = require('../controllers/User');
 const tokenVerify = require('../middleware/tokenVerify');
 // GET all users
 router.get('/', userController.getAllUser);
+router.get('/department/:id', userController.getMyDepartment);
 router.get('/search', userController.getSearchUser);
 // POST login  user
 router.post('/login', userController.loginUser);

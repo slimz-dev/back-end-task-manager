@@ -29,6 +29,30 @@ exports.getAllUser = (req, res, next) => {
 		.catch();
 };
 
+exports.getMyDepartment = (req, res, next) => {
+	const { id } = req.params;
+	User.find({ department: id })
+		.populate('role', 'name')
+		.populate('department', 'name')
+		.select('_id firstName lastName email img biography phone role department')
+		.exec()
+		.then((users) => {
+			if (users.length < 1) {
+				return res.status(404).json({
+					error: { message: 'No user found' },
+				});
+			} else {
+				return res.status(200).json({
+					data: users,
+					meta: {
+						numbers: users.length,
+					},
+				});
+			}
+		})
+		.catch();
+};
+
 exports.getSearchUser = (req, res, next) => {
 	let { firstName, lastName, phone } = req.query;
 	if (!lastName) {
@@ -208,7 +232,7 @@ exports.changeGroup = (req, res, next) => {
 exports.getInfo = (req, res, next) => {
 	const { id } = req.userData;
 	User.find({ _id: id })
-		.select('firstName lastName email img biography phone userName')
+		.select('firstName lastName email img biography phone userName department')
 		.then((result) => {
 			return res.status(200).json({
 				data: result,
