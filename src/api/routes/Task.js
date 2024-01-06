@@ -9,6 +9,9 @@ router.get('/', tokenVerify, permissionVerify, taskController.getDepartmentTask)
 
 //GET my department tasks
 router.get('/department/:id', tokenVerify, permissionVerify, taskController.getDepartmentTask);
+
+//GET select task
+router.get('/department/:id/:taskId', tokenVerify, permissionVerify, taskController.getTask);
 // // DELETE 1 department
 // router.delete('/:id', tokenVerify, permissionVerify, taskController.deleteDepartment);
 // // PATCH department

@@ -5,27 +5,29 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-exports.getMyTask = (req, res, next) => {
-	Department.find({})
-		.select()
-		.exec()
-		.then((department) => {
-			if (department.length < 1) {
+//OK
+exports.getTask = (req, res, next) => {
+	const { taskId } = req.params;
+	Task.find({ _id: taskId })
+		.populate('assigner', 'firstName lastName img')
+		.populate('assignee', 'firstName lastName img')
+		.then((task) => {
+			if (task.length < 1) {
 				return res.status(404).json({
 					error: { message: 'No department found' },
 				});
 			} else {
 				return res.status(200).json({
-					data: department,
+					data: task,
 					meta: {
-						numbers: department.length,
+						numbers: task.length,
 					},
 				});
 			}
 		})
 		.catch();
 };
-
+//OK
 exports.getDepartmentTask = (req, res, next) => {
 	const { id } = req.params;
 	Task.find({ department: id })
