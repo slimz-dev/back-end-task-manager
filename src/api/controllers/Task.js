@@ -30,8 +30,8 @@ exports.getDepartmentTask = (req, res, next) => {
 	const { id } = req.params;
 	Task.find({ department: id })
 		.populate('department', 'name')
-		.populate('assigner', 'firstName lastName ')
-		.populate('assignee', 'firstName lastName ')
+		.populate('assigner', 'firstName lastName img')
+		.populate('assignee', 'firstName lastName img')
 		.then((task) => {
 			return res.status(200).json({
 				data: task,
