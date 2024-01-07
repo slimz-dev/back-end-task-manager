@@ -20,4 +20,7 @@ router.get('/department/:id/:taskId', tokenVerify, permissionVerify, taskControl
 // POST new task
 router.post('/new', tokenVerify, permissionVerify, taskController.newTask);
 
+//POST new job
+router.post('/:id/job', tokenVerify, permissionVerify, taskController.addJob);
+
 module.exports = router;

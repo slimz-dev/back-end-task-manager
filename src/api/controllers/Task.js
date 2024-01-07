@@ -80,6 +80,34 @@ exports.changeTask = (req, res, next) => {
 };
 
 //OK
+exports.addJob = (req, res, next) => {
+	const { title } = req.body;
+	const updateData = {
+		_id: new mongoose.Types.ObjectId(),
+		title,
+		state: false,
+	};
+	const { id } = req.params;
+	Task.findOneAndUpdate(
+		{ _id: id },
+		{ $push: { smallJob: updateData } },
+		{
+			new: true,
+		}
+	)
+		.then((response) => {
+			return res.status(200).json({
+				data: response,
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				error: { message: err.message },
+			});
+		});
+};
+
+//OK
 exports.newTask = (req, res, next) => {
 	const { name, department, assigner, assignee, description, initDate, expiredDate } = req.body;
 	const startDate = new Date(initDate);

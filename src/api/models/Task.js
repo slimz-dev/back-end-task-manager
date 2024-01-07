@@ -7,6 +7,7 @@ const taskSchema = mongoose.Schema({
 	assignee: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 	description: { type: String },
 	smallJob: { type: Array },
+	comment: { type: Array },
 	state: { type: Boolean, default: false },
 	initDate: { type: Date, default: Date.now },
 	expiredDate: { type: Date, default: Date.now },

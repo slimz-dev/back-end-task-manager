@@ -1,5 +1,6 @@
 const User = require('./src/api/models/User');
 const Group = require('./src/api/models/Group');
+const Task = require('./src/api/models/Task');
 const Department = require('./src/api/models/Department');
 const { io } = require('./server');
 
@@ -90,6 +91,16 @@ const socketHandler = (socket) => {
 				io.sockets.emit('user_group_updated', { users: user });
 			});
 	});
+	socket.on('update_job', (taskId) => {
+		Task.find({ _id: taskId })
+			.populate('assigner', 'firstName lastName img')
+			.populate('assignee', 'firstName lastName img')
+			.then((task) => {
+				io.sockets.emit('updated_job', { tasks: task });
+			})
+			.catch();
+	});
+
 	socket.on('register', (data) => {
 		userState.push({
 			state: false,
