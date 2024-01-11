@@ -19,10 +19,14 @@ router.get('/department/:id/:taskId', tokenVerify, permissionVerify, taskControl
 
 // POST new task
 router.post('/new', tokenVerify, permissionVerify, taskController.newTask);
-
 //POST new job
 router.post('/:id/job', tokenVerify, permissionVerify, taskController.addJob);
+//POST change state job
 router.post('/:id', tokenVerify, permissionVerify, taskController.changeJob);
+
+//PATCH delete job
 router.patch('/:id/job', tokenVerify, permissionVerify, taskController.deleteJob);
 
+//DELETE task
+router.delete('/:taskId', tokenVerify, permissionVerify, taskController.deleteTask);
 module.exports = router;

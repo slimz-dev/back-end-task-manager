@@ -170,6 +170,9 @@ exports.addJob = (req, res, next) => {
 //OK
 exports.newTask = (req, res, next) => {
 	const { name, department, assigner, assignee, description, initDate, expiredDate } = req.body;
+	const assigneeIds = assignee.map((user) => {
+		return user.id;
+	});
 	const startDate = new Date(initDate);
 	const dueDate = new Date(expiredDate);
 	const task = new Task({
@@ -177,7 +180,7 @@ exports.newTask = (req, res, next) => {
 		name,
 		department,
 		assigner,
-		assignee,
+		assignee: assigneeIds,
 		description,
 		initDate: startDate,
 		expiredDate: dueDate,
@@ -188,5 +191,20 @@ exports.newTask = (req, res, next) => {
 		})
 		.catch((err) => {
 			return res.status(500).json({ error: err.message });
+		});
+};
+
+exports.deleteTask = (req, res, next) => {
+	const { taskId } = req.params;
+	Task.deleteOne({ _id: taskId })
+		.then((task) => {
+			return res.status(200).json({
+				msg: 'Task deleted successfully',
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				message: err.message,
+			});
 		});
 };
