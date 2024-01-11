@@ -6,5 +6,5 @@ const tokenVerify = require('../middleware/tokenVerify');
 router.get('/', commentController.getAllComment);
 
 router.post('/:taskId', commentController.newComment);
-
+router.delete('/', commentController.deleteAllComment);
 module.exports = router;

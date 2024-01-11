@@ -24,4 +24,5 @@ router.post('/new', tokenVerify, permissionVerify, taskController.newTask);
 router.post('/:id/job', tokenVerify, permissionVerify, taskController.addJob);
 router.post('/:id', tokenVerify, permissionVerify, taskController.changeJob);
 router.patch('/:id/job', tokenVerify, permissionVerify, taskController.deleteJob);
+
 module.exports = router;

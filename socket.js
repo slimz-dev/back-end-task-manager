@@ -95,6 +95,12 @@ const socketHandler = (socket) => {
 		Task.find({ _id: taskId })
 			.populate('assigner', 'firstName lastName img')
 			.populate('assignee', 'firstName lastName img')
+			.populate({
+				path: 'comment',
+				populate: {
+					path: 'createBy',
+				},
+			})
 			.then((task) => {
 				io.sockets.emit('updated_job', { tasks: task });
 			})
@@ -110,7 +116,20 @@ const socketHandler = (socket) => {
 			})
 			.catch();
 	});
-
+	socket.on('update_comment', (taskId) => {
+		Task.find({ _id: taskId })
+			.populate('assigner', 'firstName lastName img')
+			.populate('assignee', 'firstName lastName img')
+			.populate({
+				path: 'comment',
+				populate: {
+					path: 'createBy',
+				},
+			})
+			.then((task) => {
+				io.sockets.emit('updated_comment', { tasks: task });
+			}).catch;
+	});
 	socket.on('register', (data) => {
 		userState.push({
 			state: false,

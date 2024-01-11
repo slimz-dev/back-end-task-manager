@@ -11,6 +11,12 @@ exports.getTask = (req, res, next) => {
 	Task.find({ _id: taskId })
 		.populate('assigner', 'firstName lastName img')
 		.populate('assignee', 'firstName lastName img')
+		.populate({
+			path: 'comment',
+			populate: {
+				path: 'createBy',
+			},
+		})
 		.then((task) => {
 			if (task.length < 1) {
 				return res.status(404).json({
