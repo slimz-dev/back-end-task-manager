@@ -49,6 +49,7 @@ exports.getDepartmentTask = (req, res, next) => {
 //OK
 exports.deleteJob = (req, res, next) => {
 	const jobId = req.body._id;
+	let complete = '';
 	const { id } = req.params;
 	Task.findOneAndUpdate(
 		{ _id: id },
@@ -62,7 +63,12 @@ exports.deleteJob = (req, res, next) => {
 				return job.state === false;
 			});
 			if (!thisState && task.smallJob.length > 0) {
-				Task.findOneAndUpdate({ _id: id }, { state: true }, { new: true })
+				complete = new Date();
+				Task.findOneAndUpdate(
+					{ _id: id },
+					{ state: true, completedDate: complete },
+					{ new: true }
+				)
 					.then((response) => {
 						return res.status(200).json({
 							data: response,
@@ -74,7 +80,11 @@ exports.deleteJob = (req, res, next) => {
 						});
 					});
 			} else {
-				Task.findOneAndUpdate({ _id: id }, { state: false }, { new: true })
+				Task.findOneAndUpdate(
+					{ _id: id },
+					{ state: false, completedDate: complete },
+					{ new: true }
+				)
 					.then((response) => {
 						return res.status(200).json({
 							data: response,
@@ -98,13 +108,15 @@ exports.deleteJob = (req, res, next) => {
 exports.changeJob = (req, res, next) => {
 	const updateTask = req.body;
 	let projectState = false;
+	let completed = '';
 	if (!updateTask.find((job) => job.state === false)) {
 		projectState = true;
+		completed = new Date();
 	}
 	const { id } = req.params;
 	Task.findOneAndUpdate(
 		{ _id: id },
-		{ smallJob: updateTask, state: projectState },
+		{ smallJob: updateTask, state: projectState, completedDate: completed },
 		{
 			new: true,
 		}
@@ -132,7 +144,7 @@ exports.addJob = (req, res, next) => {
 	const { id } = req.params;
 	Task.findOneAndUpdate(
 		{ _id: id },
-		{ state: false, $push: { smallJob: updateData } },
+		{ state: false, $push: { smallJob: updateData }, completedDate: '' },
 		{
 			new: true,
 		}

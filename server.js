@@ -10,6 +10,7 @@ const userRoutes = require('./src/api/routes/User');
 const groupRoutes = require('./src/api/routes/Group');
 const departmentRoutes = require('./src/api/routes/Department');
 const taskRoutes = require('./src/api/routes/Task');
+const commentRoutes = require('./src/api/routes/Comment');
 const mongoose = require('./src/config/db');
 
 const io = new Server(server, {
@@ -43,7 +44,7 @@ app.use((req, res, next) => {
 app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/departments', departmentRoutes);
-
+app.use('/api/comments', commentRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use((req, res, next) => {
 	const error = new Error('Invalid');
