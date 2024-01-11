@@ -5,7 +5,7 @@ const tokenVerify = require('../middleware/tokenVerify');
 const permissionVerify = require('../middleware/permissionVerify');
 // GET total departments
 
-router.get('/', tokenVerify, permissionVerify, taskController.getDepartmentTask);
+// router.get('/', tokenVerify, permissionVerify, taskController.getDepartmentTask);
 
 //GET my department tasks
 router.get('/department/:id', tokenVerify, permissionVerify, taskController.getDepartmentTask);
@@ -22,5 +22,6 @@ router.post('/new', tokenVerify, permissionVerify, taskController.newTask);
 
 //POST new job
 router.post('/:id/job', tokenVerify, permissionVerify, taskController.addJob);
-
+router.post('/:id', tokenVerify, permissionVerify, taskController.changeJob);
+router.patch('/:id/job', tokenVerify, permissionVerify, taskController.deleteJob);
 module.exports = router;

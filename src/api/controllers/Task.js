@@ -46,13 +46,46 @@ exports.getDepartmentTask = (req, res, next) => {
 		});
 };
 
-exports.deleteTask = (req, res, next) => {
+//OK
+exports.deleteJob = (req, res, next) => {
+	const jobId = req.body._id;
 	const { id } = req.params;
-	Department.findOneAndDelete({ _id: id })
-		.then((response) => {
-			return res.status(200).json({
-				data: response,
+	Task.findOneAndUpdate(
+		{ _id: id },
+		{ $pull: { smallJob: { _id: jobId } } },
+		{
+			new: true,
+		}
+	)
+		.then((task) => {
+			const thisState = task.smallJob.find((job) => {
+				return job.state === false;
 			});
+			if (!thisState && task.smallJob.length > 0) {
+				Task.findOneAndUpdate({ _id: id }, { state: true }, { new: true })
+					.then((response) => {
+						return res.status(200).json({
+							data: response,
+						});
+					})
+					.catch((err) => {
+						return res.status(500).json({
+							error: { message: err.message },
+						});
+					});
+			} else {
+				Task.findOneAndUpdate({ _id: id }, { state: false }, { new: true })
+					.then((response) => {
+						return res.status(200).json({
+							data: response,
+						});
+					})
+					.catch((err) => {
+						return res.status(500).json({
+							error: { message: err.message },
+						});
+					});
+			}
 		})
 		.catch((err) => {
 			return res.status(500).json({
@@ -61,12 +94,21 @@ exports.deleteTask = (req, res, next) => {
 		});
 };
 
-exports.changeTask = (req, res, next) => {
-	const updateDepartment = req.body;
+//OK
+exports.changeJob = (req, res, next) => {
+	const updateTask = req.body;
+	let projectState = false;
+	if (!updateTask.find((job) => job.state === false)) {
+		projectState = true;
+	}
 	const { id } = req.params;
-	Department.findOneAndUpdate({ _id: id }, updateDepartment, {
-		new: true,
-	})
+	Task.findOneAndUpdate(
+		{ _id: id },
+		{ smallJob: updateTask, state: projectState },
+		{
+			new: true,
+		}
+	)
 		.then((response) => {
 			return res.status(200).json({
 				data: response,
@@ -83,14 +125,14 @@ exports.changeTask = (req, res, next) => {
 exports.addJob = (req, res, next) => {
 	const { title } = req.body;
 	const updateData = {
-		_id: new mongoose.Types.ObjectId(),
+		_id: new mongoose.Types.ObjectId().toString(),
 		title,
 		state: false,
 	};
 	const { id } = req.params;
 	Task.findOneAndUpdate(
 		{ _id: id },
-		{ $push: { smallJob: updateData } },
+		{ state: false, $push: { smallJob: updateData } },
 		{
 			new: true,
 		}

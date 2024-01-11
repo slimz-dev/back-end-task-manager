@@ -91,12 +91,22 @@ const socketHandler = (socket) => {
 				io.sockets.emit('user_group_updated', { users: user });
 			});
 	});
-	socket.on('update_job', (taskId) => {
+	socket.on('update_job', (taskId, departmentId) => {
 		Task.find({ _id: taskId })
 			.populate('assigner', 'firstName lastName img')
 			.populate('assignee', 'firstName lastName img')
 			.then((task) => {
 				io.sockets.emit('updated_job', { tasks: task });
+			})
+			.catch();
+	});
+
+	socket.on('change_job', (departmentId) => {
+		Task.find({ department: departmentId })
+			.populate('assigner', 'firstName lastName img')
+			.populate('assignee', 'firstName lastName img')
+			.then((task) => {
+				io.sockets.emit('changed_job', { tasks: task });
 			})
 			.catch();
 	});
