@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const userRoutes = require('./src/api/routes/User');
 const groupRoutes = require('./src/api/routes/Group');
 const departmentRoutes = require('./src/api/routes/Department');
+const personaltaskRoutes = require('./src/api/routes/PersonalTask');
 const taskRoutes = require('./src/api/routes/Task');
 const commentRoutes = require('./src/api/routes/Comment');
 const mongoose = require('./src/config/db');
@@ -45,6 +46,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/personaltask', personaltaskRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use((req, res, next) => {
 	const error = new Error('Invalid');

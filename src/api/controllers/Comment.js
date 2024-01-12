@@ -64,6 +64,7 @@ exports.newComment = (req, res, next) => {
 		});
 };
 
+//OK
 exports.deleteAllComment = (req, res, next) => {
 	const { id } = req.params;
 	Task.findOneAndUpdate({}, { comment: [] }, { new: true })

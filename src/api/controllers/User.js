@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
+const PersonalTask = require('../models/PersonalTask');
 require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
@@ -139,13 +140,18 @@ exports.registerUser = (req, res, next) => {
 					} else {
 						Group.find({ name: process.env.DEFAULT_ROLE }).then((group) => {
 							const users = new User({
-								_id: new mongoose.Types.ObjectId(),
+								_id: new mongoose.Types.ObjectId().toString(),
 								firstName: req.body.firstName,
 								email: req.body.email,
 								password: hash,
 								role: group[0]._id,
 							});
 							users.save().then((result) => {
+								const personalTask = new PersonalTask({
+									_id: result._id,
+									task: [],
+								});
+								personalTask.save();
 								return res.status(201).json({ User: result });
 							});
 						});

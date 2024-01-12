@@ -194,6 +194,7 @@ exports.newTask = (req, res, next) => {
 		});
 };
 
+//OK
 exports.deleteTask = (req, res, next) => {
 	const { taskId } = req.params;
 	Task.deleteOne({ _id: taskId })
