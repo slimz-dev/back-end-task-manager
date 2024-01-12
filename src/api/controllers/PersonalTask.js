@@ -136,3 +136,37 @@ exports.changeTaskState = (req, res, next) => {
 			});
 		});
 };
+
+exports.deleteAllTask = (req, res, next) => {
+	PersonalTask.deleteMany({})
+		.then((result) => {
+			return res.status(200).json({
+				message: 'Delete successfully',
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				message: err.message,
+			});
+		});
+};
+
+exports.deleteCurrentTask = (req, res, next) => {
+	const { personId } = req.params;
+	const { taskId } = req.params;
+	PersonalTask.findOneAndUpdate(
+		{ _id: personId },
+		{ $pull: { task: { _id: taskId } } },
+		{ new: true }
+	)
+		.then((result) => {
+			return res.status(200).json({
+				data: result,
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				message: err.message,
+			});
+		});
+};

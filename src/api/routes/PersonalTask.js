@@ -7,5 +7,7 @@ router.get('/', personalTaskController.getAllTask);
 router.get('/:id', personalTaskController.getMyTask);
 router.post('/:id', personalTaskController.addTask);
 router.patch('/:id', personalTaskController.changeTaskState);
+router.patch('/:personId/:taskId', personalTaskController.deleteCurrentTask);
+router.delete('/', personalTaskController.deleteAllTask);
 
 module.exports = router;
