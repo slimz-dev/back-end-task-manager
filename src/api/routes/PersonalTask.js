@@ -6,5 +6,6 @@ const tokenVerify = require('../middleware/tokenVerify');
 router.get('/', personalTaskController.getAllTask);
 router.get('/:id', personalTaskController.getMyTask);
 router.post('/:id', personalTaskController.addTask);
+router.patch('/:id', personalTaskController.changeTaskState);
 
 module.exports = router;

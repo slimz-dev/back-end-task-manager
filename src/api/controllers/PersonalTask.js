@@ -32,7 +32,6 @@ exports.getAllTask = (req, res, next) => {
 exports.getMyTask = (req, res, next) => {
 	const { id } = req.params;
 	PersonalTask.find({ _id: id })
-		.populate('_id', 'img')
 		.then((result) => {
 			return res.status(200).json({
 				data: result,
@@ -118,6 +117,22 @@ exports.addTask = (req, res, next) => {
 				error: {
 					message: err.message,
 				},
+			});
+		});
+};
+
+exports.changeTaskState = (req, res, next) => {
+	const updateData = req.body;
+	const { id } = req.params;
+	PersonalTask.findOneAndUpdate({ _id: id }, { task: updateData }, { new: true })
+		.then((task) => {
+			return res.status(200).json({
+				data: task,
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				message: err.message,
 			});
 		});
 };
