@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const PersonalTask = require('../models/PersonalTask');
+const Calendar = require('../models/Calendar');
 require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
@@ -151,7 +152,13 @@ exports.registerUser = (req, res, next) => {
 									_id: result._id,
 									task: [],
 								});
-								personalTask.save();
+								personalTask.save().then((result) => {
+									const myCalendar = new Calendar({
+										_id: result._id,
+										calendar: [],
+									});
+									myCalendar.save();
+								});
 								return res.status(201).json({ User: result });
 							});
 						});
