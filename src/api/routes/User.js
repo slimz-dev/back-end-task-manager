@@ -19,6 +19,7 @@ router.delete('/', userController.deleteAll);
 //GET my info
 router.get('/me', tokenVerify, userController.getInfo);
 
+router.get('/me/tasks', tokenVerify, userController.getMyTask);
 // PATCH user
 router.patch('/me', tokenVerify, userController.changeInfo);
 

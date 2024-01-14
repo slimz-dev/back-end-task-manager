@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const PersonalTask = require('../models/PersonalTask');
 const Calendar = require('../models/Calendar');
+const Task = require('../models/Task');
+
 require('dotenv').config();
 
 exports.getAllUser = (req, res, next) => {
@@ -383,6 +385,22 @@ exports.deleteDepartment = (req, res, next) => {
 				error: {
 					message: err.msg,
 				},
+			});
+		});
+};
+
+exports.getMyTask = (req, res, next) => {
+	const { id } = req.userData;
+	Task.find({ assignee: id })
+		.populate('assigner', 'firstName lastName')
+		.then((task) => {
+			return res.status(200).json({
+				data: task,
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				msg: err.message,
 			});
 		});
 };

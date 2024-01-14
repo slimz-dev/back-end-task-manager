@@ -1,6 +1,6 @@
 require('dotenv').config();
 const Comment = require('../models/Comment');
-const Calendar = require('../models/Calendar');
+const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -8,93 +8,39 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 //OK
-exports.getAllCalendar = (req, res, next) => {
-	Comment.find({})
+exports.getMyNotification = (req, res, next) => {
+	const { userId } = req.params;
+	Notification.findOne({ _id: userId })
 		.select()
 		.exec()
-		.then((comment) => {
-			if (comment.length < 1) {
-				return res.status(404).json({
-					error: { message: 'No comment found' },
+		.then((notification) => {
+			if (notification === null) {
+				const notification = new Notification({
+					_id: userId,
+					notification: [],
 				});
-			} else {
-				return res.status(200).json({
-					data: comment,
-					meta: {
-						numbers: comment.length,
-					},
-				});
-			}
-		})
-		.catch();
-};
-
-//OK
-exports.getMyCalendar = (req, res, next) => {
-	const { userId } = req.params;
-	Calendar.find({ _id: userId })
-		.then((calendar) => {
-			return res.status(200).json({
-				data: calendar,
-			});
-		})
-		.catch((err) => {
-			return res.status(500).json({ message: err.message });
-		});
-};
-
-// //OK
-exports.newCalendar = (req, res, next) => {
-	const { userId } = req.params;
-	const data = req.body;
-	console.log(data);
-	Calendar.find({ _id: userId })
-		.then((calendar) => {
-			if (calendar.length !== 0) {
-				Calendar.findOneAndUpdate(
-					{ _id: userId },
-					{
-						$push: {
-							calendar: {
-								_id: new mongoose.Types.ObjectId(),
-								...data,
-							},
-						},
-					},
-					{ new: true }
-				)
-					.then((calendar) => {
+				notification
+					.save()
+					.then((notification) => {
 						return res.status(200).json({
-							data: calendar,
+							data: notification,
+							meta: {
+								numbers: notification.notification.length,
+							},
 						});
 					})
 					.catch((err) => {
 						return res.status(500).json({
-							message: err.message,
-						});
-					});
-			} else {
-				const newCalendar = new Calendar({
-					_id: userId,
-					calendar: [
-						{
-							_id: new mongoose.Types.ObjectId(),
-							...data,
-						},
-					],
-				});
-				newCalendar
-					.save()
-					.then((result) => {
-						return res.status(200).json({
-							data: result,
-						});
-					})
-					.catch((err) => {
-						return res.status(400).json({
 							msg: err.message,
 						});
 					});
+			} else {
+				return res.status(200).json({
+					data: notification,
+					meta: {
+						numbers: notification.notification.length,
+					},
+				});
 			}
 		})
 		.catch((err) => {
@@ -104,12 +50,26 @@ exports.newCalendar = (req, res, next) => {
 		});
 };
 
-//OK
-exports.deleteCalendar = (req, res, next) => {
-	Calendar.deleteOne({})
-		.then((calendar) => {
+exports.pushMyNotification = (req, res, next) => {
+	const { userId } = req.params;
+	const { departmentId, taskId } = req.body;
+	Notification.findOneAndUpdate(
+		{ _id: userId },
+		{
+			$push: {
+				notification: {
+					_id: new mongoose.Types.ObjectId.toString(),
+					read: false,
+					departmentId: departmentId,
+					taskId: taskId,
+				},
+			},
+		},
+		{ new: true }
+	)
+		.then((notification) => {
 			return res.status(200).json({
-				msg: 'Delete successfully',
+				data: notification,
 			});
 		})
 		.catch((err) => {
@@ -119,22 +79,18 @@ exports.deleteCalendar = (req, res, next) => {
 		});
 };
 
-exports.deleteCurrentCalendar = (req, res, next) => {
+exports.deleteMyNotification = (req, res, next) => {
 	const { userId } = req.params;
-	const calendarId = req.body;
-	console.log(calendarId);
-	Calendar.findOneAndUpdate(
+	Notification.findOneAndUpdate(
 		{ _id: userId },
 		{
-			$pull: {
-				calendar: calendarId,
-			},
+			notification: [],
 		},
 		{ new: true }
 	)
-		.then((calendar) => {
+		.then((notification) => {
 			return res.status(200).json({
-				data: calendar,
+				data: notification,
 			});
 		})
 		.catch((err) => {

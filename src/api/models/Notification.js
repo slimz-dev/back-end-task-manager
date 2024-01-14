@@ -4,7 +4,7 @@ const notificationSchema = mongoose.Schema({
 	notification: [
 		{
 			_id: { type: mongoose.Schema.Types.ObjectId },
-			read: { type: Boolean, default: false },
+			read: { type: Boolean },
 			departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
 			taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
 		},
