@@ -91,6 +91,15 @@ const socketHandler = (socket) => {
 				io.sockets.emit('user_group_updated', { users: user });
 			});
 	});
+
+	socket.on('update_my_department', (departmentId) => {
+		User.find({ department: departmentId })
+			.populate('role', 'name')
+			.populate('department', 'name')
+			.then((user) => {
+				io.sockets.emit('my_department_updated', { users: user });
+			});
+	});
 	socket.on('update_job', (taskId, departmentId) => {
 		Task.find({ _id: taskId })
 			.populate('assigner', 'firstName lastName img')

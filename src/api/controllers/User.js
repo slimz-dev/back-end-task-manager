@@ -55,19 +55,17 @@ exports.getMyDepartment = (req, res, next) => {
 		.catch();
 };
 
-exports.getSearchUser = (req, res, next) => {
-	let { firstName, lastName, phone } = req.query;
-	if (!lastName) {
-		lastName = null;
-	}
-	User.find({ phone: phone })
-		.or([{ firstName: new RegExp(firstName, 'i') }, { lastName: new RegExp(lastName, 'i') }])
-		.select('_id firstName lastName email img biography phone')
+exports.getAnonymousUser = (req, res, next) => {
+	User.find({ department: undefined })
+		.select('_id firstName lastName img ')
 		.exec()
 		.then((users) => {
 			if (users.length < 1) {
-				return res.status(404).json({
-					error: { message: 'No user found' },
+				return res.status(200).json({
+					data: users,
+					meta: {
+						numbers: users.length,
+					},
 				});
 			} else {
 				return res.status(200).json({
@@ -78,7 +76,11 @@ exports.getSearchUser = (req, res, next) => {
 				});
 			}
 		})
-		.catch();
+		.catch((err) => {
+			return res.status(500).json({
+				message: err.message,
+			});
+		});
 };
 
 exports.loginUser = (req, res, next) => {

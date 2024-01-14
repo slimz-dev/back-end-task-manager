@@ -6,7 +6,7 @@ const emailVerify = require('../middleware/emailVerify');
 // GET all users
 router.get('/', userController.getAllUser);
 router.get('/department/:id', userController.getMyDepartment);
-router.get('/search', userController.getSearchUser);
+router.get('/anonymous', userController.getAnonymousUser);
 // POST login  user
 router.post('/login', userController.loginUser);
 
