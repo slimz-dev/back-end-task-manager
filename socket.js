@@ -24,7 +24,7 @@ function handleCatchingState(id, state) {
 	const userExisted = userState.find((user) => user.id === id);
 	if (userExisted === undefined) {
 		userState.push({
-			state: false,
+			state: state,
 			id: id,
 		});
 	}
