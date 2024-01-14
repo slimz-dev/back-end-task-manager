@@ -20,6 +20,15 @@ User.find({})
 	});
 
 function handleCatchingState(id, state) {
+	//Check new user registered
+	const userExisted = userState.find((user) => user.id === id);
+	if (userExisted === undefined) {
+		userState.push({
+			state: false,
+			id: id,
+		});
+	}
+
 	userState = userState.map((user) => {
 		//find correct person to changing state
 		if (user.id === id) {
@@ -28,7 +37,6 @@ function handleCatchingState(id, state) {
 				id,
 			};
 		}
-
 		// not update
 		return {
 			state: user.state,
