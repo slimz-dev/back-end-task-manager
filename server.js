@@ -13,6 +13,7 @@ const personaltaskRoutes = require('./src/api/routes/PersonalTask');
 const taskRoutes = require('./src/api/routes/Task');
 const commentRoutes = require('./src/api/routes/Comment');
 const calendarRoutes = require('./src/api/routes/Calendar');
+const emailRoutes = require('./src/api/routes/Email');
 const mongoose = require('./src/config/db');
 
 const io = new Server(server, {
@@ -50,6 +51,7 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/personaltask', personaltaskRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/calendars', calendarRoutes);
+app.use('/api/email', emailRoutes);
 app.use((req, res, next) => {
 	const error = new Error('Invalid');
 	error.status = 404;

@@ -123,64 +123,79 @@ exports.loginUser = (req, res, next) => {
 };
 
 exports.registerUser = (req, res, next) => {
-	//Find exist Email
-	User.find({ email: req.body.email })
-		.then((user) => {
-			if (user.length === 0 && req.body.email && req.body.password && req.body.firstName) {
-				if (!validator.isEmail(req.body.email)) {
-					return res.status(422).json({
-						error: { message: 'This is not a valid email' },
-					});
-				}
-				//ENCODE password
-				bcrypt.hash(req.body.password, 10, (err, hash) => {
-					if (err) {
-						return res.status(500).json({
-							error: { message: err.message },
-						});
-					} else {
-						Group.find({ name: process.env.DEFAULT_ROLE }).then((group) => {
-							const users = new User({
-								_id: new mongoose.Types.ObjectId().toString(),
-								firstName: req.body.firstName,
-								email: req.body.email,
-								password: hash,
-								role: group[0]._id,
-							});
-							users.save().then((result) => {
-								const personalTask = new PersonalTask({
-									_id: result._id,
-									task: [],
-								});
-								personalTask.save().then((result) => {
-									const myCalendar = new Calendar({
-										_id: result._id,
-										calendar: [],
-									});
-									myCalendar.save();
-								});
-								return res.status(201).json({ User: result });
-							});
+	const { emailCheck } = req.userData;
+	//Check email valid
+	if (emailCheck === req.body.email) {
+		// Find exist Email
+		User.find({ email: req.body.email })
+			.then((user) => {
+				if (
+					user.length === 0 &&
+					req.body.email &&
+					req.body.password &&
+					req.body.firstName
+				) {
+					if (!validator.isEmail(req.body.email)) {
+						return res.status(422).json({
+							error: { message: 'This is not a valid email' },
 						});
 					}
-				});
-			} else {
-				if (user.length === 1) {
-					return res.status(409).json({
-						error: { message: 'Existed' },
+					//ENCODE password
+					bcrypt.hash(req.body.password, 10, (err, hash) => {
+						if (err) {
+							return res.status(500).json({
+								error: { message: err.message },
+							});
+						} else {
+							Group.find({ name: process.env.DEFAULT_ROLE }).then((group) => {
+								const users = new User({
+									_id: new mongoose.Types.ObjectId().toString(),
+									firstName: req.body.firstName,
+									email: req.body.email,
+									password: hash,
+									role: group[0]._id,
+								});
+								users.save().then((result) => {
+									const personalTask = new PersonalTask({
+										_id: result._id,
+										task: [],
+									});
+									personalTask.save().then((result) => {
+										const myCalendar = new Calendar({
+											_id: result._id,
+											calendar: [],
+										});
+										myCalendar.save();
+									});
+									return res.status(201).json({ User: result });
+								});
+							});
+						}
 					});
 				} else {
-					return res.status(422).json({
-						error: { message: 'Fields required' },
-					});
+					if (user.length === 1) {
+						return res.status(409).json({
+							error: { message: 'Existed' },
+						});
+					} else {
+						return res.status(422).json({
+							error: { message: 'Fields required' },
+						});
+					}
 				}
-			}
-		})
-		.catch((err) => {
-			return res.status(500).json({
-				error: { message: err.message },
+			})
+			.catch((err) => {
+				return res.status(500).json({
+					error: { message: err.message },
+				});
 			});
+	} else {
+		return res.status(403).json({
+			error: {
+				message: 'Unverified',
+			},
 		});
+	}
 };
 
 exports.deleteAll = (req, res, next) => {
@@ -325,6 +340,47 @@ exports.changePassword = (req, res, next) => {
 		.catch((error) => {
 			return res.status(500).json({
 				error: { message: error.message },
+			});
+		});
+};
+
+exports.deleteDepartment = (req, res, next) => {
+	const { id } = req.params;
+	const { department } = req.body;
+	User.findOne({ _id: id })
+		.then((user) => {
+			user.department = undefined;
+			user.save().then();
+			User.find({ department: department })
+				.populate('role', 'name')
+				.populate('department', 'name')
+				.select('_id firstName lastName email img biography phone role department')
+				.exec()
+				.then((user) => {
+					return res.status(200).json({
+						data: user,
+					});
+				})
+				.catch((err) => {
+					return res.status(500).json({
+						error: {
+							message: err.message,
+						},
+					});
+				})
+				.catch((err) => {
+					return res.status(500).json({
+						error: {
+							message: err.message,
+						},
+					});
+				});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				error: {
+					message: err.msg,
+				},
 			});
 		});
 };
