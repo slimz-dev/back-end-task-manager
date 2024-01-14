@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 const notificationSchema = mongoose.Schema({
-	_id: mongoose.Schema.Types.ObjectId,
-	department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
-	receiver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-	date: { type: Date, default: Date.now },
+	_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+	notification: [
+		{
+			_id: { type: mongoose.Schema.Types.ObjectId },
+			read: { type: Boolean, default: false },
+			departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
+			taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
+		},
+	],
 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

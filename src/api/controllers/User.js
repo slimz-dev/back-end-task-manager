@@ -125,9 +125,9 @@ exports.loginUser = (req, res, next) => {
 };
 
 exports.registerUser = (req, res, next) => {
-	const { emailCheck } = req.userData;
+	const { email } = req.userData;
 	//Check email valid
-	if (emailCheck === req.body.email) {
+	if (email === req.body.email) {
 		// Find exist Email
 		User.find({ email: req.body.email })
 			.then((user) => {
