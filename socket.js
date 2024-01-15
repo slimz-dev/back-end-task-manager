@@ -20,6 +20,7 @@ User.find({})
 	});
 
 function handleCatchingState(id, state) {
+	console.log(userLoggedIn);
 	//Check new user registered
 	const userExisted = userState.find((user) => user.id === id);
 	if (userExisted === undefined) {
@@ -133,7 +134,7 @@ const socketHandler = (socket) => {
 			})
 			.catch();
 	});
-	socket.on('update_comment', (taskId) => {
+	socket.on('update_comment', (taskId, userId, departmentId) => {
 		Task.find({ _id: taskId })
 			.populate('assigner', 'firstName lastName img')
 			.populate('assignee', 'firstName lastName img')
@@ -144,9 +145,42 @@ const socketHandler = (socket) => {
 				},
 			})
 			.then((task) => {
+				//update comment
 				io.sockets.emit('updated_comment', { tasks: task });
+
+				// send notification
+
+				//get all id from task
+				const assignerId = task[0].assigner._id.toString();
+				const assigneeIds = task[0].assignee.map((user) => user._id.toString());
+				const arrayOfId = [assignerId, ...assigneeIds];
+
+				//get all id except the id make comment
+				let broadcastIds = arrayOfId;
+				let broadcastSocketIds = [];
+				const indexFound = arrayOfId.indexOf(userId);
+				if (indexFound !== -1) {
+					broadcastIds.splice(indexFound, 1);
+				}
+
+				//get all the current socketid opened by the remain ids
+				for (let socketId in userLoggedIn) {
+					if (broadcastIds.includes(userLoggedIn[socketId])) {
+						broadcastSocketIds.push(socketId);
+					}
+				}
+				//broadcast notification
+				broadcastSocketIds.forEach((socketId) => {
+					console.log('run');
+					io.to(socketId).emit('notification', {
+						receive: userLoggedIn[socketId],
+						departmentId: departmentId,
+						taskId: taskId,
+					});
+				});
 			}).catch;
 	});
+
 	socket.on('register', (data) => {
 		userState.push({
 			state: false,

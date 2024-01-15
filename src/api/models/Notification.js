@@ -7,6 +7,7 @@ const notificationSchema = mongoose.Schema({
 			read: { type: Boolean },
 			departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
 			taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
+			createdAt: { type: Date },
 		},
 	],
 });
