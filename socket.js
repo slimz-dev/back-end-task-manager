@@ -2,6 +2,8 @@ const User = require('./src/api/models/User');
 const Group = require('./src/api/models/Group');
 const Task = require('./src/api/models/Task');
 const Department = require('./src/api/models/Department');
+const Notification = require('./src/api/models/Notification');
+const mongoose = require('mongoose');
 const { io } = require('./server');
 
 let userState = [];
@@ -20,7 +22,6 @@ User.find({})
 	});
 
 function handleCatchingState(id, state) {
-	console.log(userLoggedIn);
 	//Check new user registered
 	const userExisted = userState.find((user) => user.id === id);
 	if (userExisted === undefined) {
@@ -60,6 +61,71 @@ function isChangingState(tab) {
 		}
 	}
 	return true;
+}
+
+function updateNotifacation(userId, departmentId, taskId) {
+	const currentDate = new Date();
+	Notification.findOne({ _id: userId })
+		.select()
+		.exec()
+		.then((notification) => {
+			//NOT EXISTED
+			if (notification === null) {
+				const notification = new Notification({
+					_id: id,
+					notification: [
+						{
+							_id: new mongoose.Types.ObjectId().toString(),
+							read: false,
+							departmentId: departmentId,
+							taskId: taskId,
+							createdAt: currentDate,
+						},
+					],
+				});
+				notification.save().then((notification) => {
+					let broadcastSocketIds = [];
+					//get all the current socketid opened by the remain ids
+					for (let socketId in userLoggedIn) {
+						if (userId === userLoggedIn[socketId]) {
+							broadcastSocketIds.push(socketId);
+						}
+					}
+					//broadcast notification
+					broadcastSocketIds.forEach((socketId) => {
+						io.to(socketId).emit('notification');
+					});
+				});
+			} else {
+				Notification.findOneAndUpdate(
+					{ _id: userId },
+					{
+						$push: {
+							notification: {
+								_id: new mongoose.Types.ObjectId().toString(),
+								read: false,
+								departmentId: departmentId,
+								taskId: taskId,
+								createdAt: currentDate,
+							},
+						},
+					},
+					{ new: true }
+				).then((notification) => {
+					let broadcastSocketIds = [];
+					//get all the current socketid opened by the remain ids
+					for (let socketId in userLoggedIn) {
+						if (userId === userLoggedIn[socketId]) {
+							broadcastSocketIds.push(socketId);
+						}
+					}
+					//broadcast notification
+					broadcastSocketIds.forEach((socketId) => {
+						io.to(socketId).emit('notification');
+					});
+				});
+			}
+		});
 }
 
 const socketHandler = (socket) => {
@@ -144,40 +210,33 @@ const socketHandler = (socket) => {
 					path: 'createBy',
 				},
 			})
-			.then((task) => {
+			.then(async (task) => {
 				//update comment
 				io.sockets.emit('updated_comment', { tasks: task });
-
 				// send notification
 
 				//get all id from task
 				const assignerId = task[0].assigner._id.toString();
 				const assigneeIds = task[0].assignee.map((user) => user._id.toString());
-				const arrayOfId = [assignerId, ...assigneeIds];
-
+				const commentIds = task[0].comment.map((user) => user.createBy._id.toString());
+				const arrayOfIds = [assignerId, ...assigneeIds, ...commentIds];
+				const removeDuplicates = arrayOfIds.filter(
+					(id, index) => arrayOfIds.indexOf(id) === index
+				);
 				//get all id except the id make comment
-				let broadcastIds = arrayOfId;
-				let broadcastSocketIds = [];
-				const indexFound = arrayOfId.indexOf(userId);
+				let broadcastIds = removeDuplicates;
+				const indexFound = removeDuplicates.indexOf(userId);
 				if (indexFound !== -1) {
 					broadcastIds.splice(indexFound, 1);
 				}
 
-				//get all the current socketid opened by the remain ids
-				for (let socketId in userLoggedIn) {
-					if (broadcastIds.includes(userLoggedIn[socketId])) {
-						broadcastSocketIds.push(socketId);
-					}
+				//Update notification
+				for await (const id of broadcastIds) {
+					const update = () => {
+						updateNotifacation(id, departmentId, taskId);
+					};
+					update();
 				}
-				//broadcast notification
-				broadcastSocketIds.forEach((socketId) => {
-					console.log('run');
-					io.to(socketId).emit('notification', {
-						receive: userLoggedIn[socketId],
-						departmentId: departmentId,
-						taskId: taskId,
-					});
-				});
 			}).catch;
 	});
 
