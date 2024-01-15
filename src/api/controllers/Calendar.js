@@ -34,7 +34,6 @@ exports.getMyCalendar = (req, res, next) => {
 	const { userId } = req.params;
 	Calendar.findOne({ _id: userId })
 		.then((calendar) => {
-			console.log(calendar);
 			if (calendar !== null) {
 				return res.status(200).json({
 					data: calendar,
