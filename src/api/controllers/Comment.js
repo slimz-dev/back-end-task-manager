@@ -51,6 +51,9 @@ exports.newComment = (req, res, next) => {
 				}
 			)
 				.then((task) => {
+					task.comment.sort((a, b) => {
+						return b.createAt - a.createAt;
+					});
 					return res.status(200).json({
 						data: task,
 					});

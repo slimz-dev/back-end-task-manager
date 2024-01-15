@@ -72,7 +72,7 @@ function updateNotifacation(userId, departmentId, taskId) {
 			//NOT EXISTED
 			if (notification === null) {
 				const notification = new Notification({
-					_id: id,
+					_id: userId,
 					notification: [
 						{
 							_id: new mongoose.Types.ObjectId().toString(),
@@ -211,6 +211,9 @@ const socketHandler = (socket) => {
 				},
 			})
 			.then(async (task) => {
+				task[0].comment.sort((a, b) => {
+					return b.createAt - a.createAt;
+				});
 				//update comment
 				io.sockets.emit('updated_comment', { tasks: task });
 				// send notification

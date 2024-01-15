@@ -23,6 +23,9 @@ exports.getTask = (req, res, next) => {
 					error: { message: 'No department found' },
 				});
 			} else {
+				task[0].comment.sort((a, b) => {
+					return b.createAt - a.createAt;
+				});
 				return res.status(200).json({
 					data: task,
 					meta: {

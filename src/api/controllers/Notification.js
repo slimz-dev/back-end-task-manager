@@ -37,6 +37,9 @@ exports.getMyNotification = (req, res, next) => {
 								unreadNotifications += 1;
 							}
 						});
+						notification.notification.sort((a, b) => {
+							return Date.parse(b.createdAt) - Date.parse(a.createdAt);
+						});
 						return res.status(200).json({
 							data: notification,
 							meta: {
@@ -50,6 +53,9 @@ exports.getMyNotification = (req, res, next) => {
 						});
 					});
 			} else {
+				notification.notification.sort((a, b) => {
+					return b.createdAt - a.createdAt;
+				});
 				let unreadNotifications = 0;
 				notification.notification.forEach((noti) => {
 					if (!noti.read) {
@@ -214,11 +220,70 @@ exports.deleteMyNotification = (req, res, next) => {
 		});
 };
 
+exports.changeStateNotification = (req, res, next) => {
+	const { userId } = req.params;
+	const updateData = req.body;
+	Notification.findOneAndUpdate(
+		{ _id: userId },
+		{
+			notification: updateData,
+		},
+		{ new: true }
+	)
+		.select()
+		.populate({
+			path: 'notification',
+			populate: [
+				{
+					path: 'departmentId',
+				},
+				{ path: 'taskId', select: 'name' },
+			],
+		})
+		.exec()
+		.then((notification) => {
+			let unreadNotifications = 0;
+			notification.notification.forEach((noti) => {
+				if (!noti.read) {
+					unreadNotifications += 1;
+				}
+			});
+			notification.notification.sort((a, b) => {
+				return Date.parse(b.createdAt) - Date.parse(a.createdAt);
+			});
+			return res.status(200).json({
+				data: notification,
+				meta: {
+					numbers: unreadNotifications,
+				},
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				msg: err.message,
+			});
+		});
+};
+
 exports.getAllNotifications = (req, res, next) => {
 	Notification.find({})
 		.then((notification) => {
 			return res.status(200).json({
 				data: notification,
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				msg: err.message,
+			});
+		});
+};
+
+exports.deleteAllNotifications = (req, res, next) => {
+	Notification.deleteMany({})
+		.then((notification) => {
+			return res.status(200).json({
+				msg: 'Delete successfully',
 			});
 		})
 		.catch((err) => {
