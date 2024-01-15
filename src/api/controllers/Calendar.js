@@ -32,11 +32,24 @@ exports.getAllCalendar = (req, res, next) => {
 //OK
 exports.getMyCalendar = (req, res, next) => {
 	const { userId } = req.params;
-	Calendar.find({ _id: userId })
+	Calendar.findOne({ _id: userId })
 		.then((calendar) => {
-			return res.status(200).json({
-				data: calendar,
-			});
+			console.log(calendar);
+			if (calendar !== null) {
+				return res.status(200).json({
+					data: calendar,
+				});
+			} else {
+				const calendar = new Calendar({
+					_id: userId,
+					calendar: [],
+				});
+				calendar.save().then((calendar) => {
+					return res.status(200).json({
+						data: calendar,
+					});
+				});
+			}
 		})
 		.catch((err) => {
 			return res.status(500).json({ message: err.message });
