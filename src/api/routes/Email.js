@@ -5,6 +5,6 @@ const tokenVerify = require('../middleware/tokenVerify');
 const permissionVerify = require('../middleware/permissionVerify');
 
 // POST new department
-router.post('/send', tokenVerify, permissionVerify, emailController.newEmail);
+router.post('/send', tokenVerify, permissionVerify('invite', ['create']), emailController.newEmail);
 
 module.exports = router;

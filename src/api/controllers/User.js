@@ -264,7 +264,8 @@ exports.changeGroup = (req, res, next) => {
 exports.getInfo = (req, res, next) => {
 	const { id } = req.userData;
 	User.find({ _id: id })
-		.select('firstName lastName email img biography phone userName department')
+		.select('firstName lastName email img biography phone userName department role')
+		.populate('role')
 		.then((result) => {
 			return res.status(200).json({
 				data: result,

@@ -54,7 +54,23 @@ exports.getDepartmentTask = (req, res, next) => {
 			});
 		});
 };
-
+exports.getMyDepartmentTask = (req, res, next) => {
+	const { id } = req.params;
+	Task.find({ department: id })
+		.populate('department', 'name')
+		.populate('assigner', 'firstName lastName img')
+		.populate('assignee', 'firstName lastName img')
+		.then((task) => {
+			return res.status(200).json({
+				data: task,
+			});
+		})
+		.catch((err) => {
+			return res.status(500).json({
+				error: { message: err.message },
+			});
+		});
+};
 //OK
 exports.deleteJob = (req, res, next) => {
 	const jobId = req.body._id;

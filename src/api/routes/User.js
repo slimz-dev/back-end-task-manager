@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require('../controllers/User');
 const tokenVerify = require('../middleware/tokenVerify');
 const emailVerify = require('../middleware/emailVerify');
+const permissionVerify = require('../middleware/permissionVerify');
 // GET all users
 router.get('/', userController.getAllUser);
 router.get('/department/:id', userController.getMyDepartment);
@@ -27,9 +28,19 @@ router.patch('/me', tokenVerify, userController.changeInfo);
 router.patch('/me/password', tokenVerify, userController.changePassword);
 
 //ADD department + role
-router.patch('/assign/:id', tokenVerify, userController.changeGroup);
+router.patch(
+	'/assign/:id',
+	tokenVerify,
+	permissionVerify('localMemberManager', ['create']),
+	userController.changeGroup
+);
 //DELETE department
-router.patch('/:id/remove', tokenVerify, userController.deleteDepartment);
+router.patch(
+	'/:id/remove',
+	tokenVerify,
+	permissionVerify('localMemberManager', ['delete']),
+	userController.deleteDepartment
+);
 
 // DELETE 1 user
 router.delete('/me', tokenVerify, userController.deleteMe);
