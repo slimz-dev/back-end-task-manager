@@ -46,9 +46,6 @@ app.use((req, res, next) => {
 	next();
 });
 
-app.use('/', (req, res) => {
-	res.send('Server is running');
-});
 app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/departments', departmentRoutes);

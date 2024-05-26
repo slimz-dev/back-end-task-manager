@@ -27,7 +27,7 @@ exports.newEmail = (req, res, next) => {
 				to: email, // list of receivers
 				subject: 'Registration verify from task manager', // Subject line
 				text: 'Hello world?', // plain text body
-				html: `<div>Click <a href="http://localhost:3000/register/${token}">this</a> link to register !</div>`, // html body
+				html: `<div>Click <a href=${process.env.FE_URL}/register/${token}>this</a> link to register !</div>`, // html body
 			});
 
 			console.log('Message sent: %s', info.messageId);
