@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const port = 3001;
 const app = express();
@@ -19,7 +20,7 @@ const mongoose = require('./src/config/db');
 
 const io = new Server(server, {
 	cors: {
-		origin: 'http://localhost:3000',
+		origin: process.env.FE_URL,
 	},
 });
 
@@ -76,3 +77,5 @@ io.on('connection', socketHandler);
 server.listen(port, () => {
 	console.log(`Example app listening on port ${port}`);
 });
+
+module.exports = app;
