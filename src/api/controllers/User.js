@@ -7,8 +7,46 @@ const validator = require('validator');
 const PersonalTask = require('../models/PersonalTask');
 const Calendar = require('../models/Calendar');
 const Task = require('../models/Task');
-
+const cloudinary = require('../../../cloudinary');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
+const imagePath = path.join(__dirname, '../../../assets/user.png');
+
+exports.uploadImg = (req, res, next) => {
+	// User.find({})
+	// 	.exec()
+	// 	.then((users) => {
+	// 		if (users.length < 1) {
+	// 			return res.status(404).json({
+	// 				error: { message: 'No user found' },
+	// 			});
+	// 		} else {
+	// 			const file = fs.readFile(imagePath, (err, data) => {
+	// 				if (err) {
+	// 					console.error('Error reading image file:', err);
+	// 					return;
+	// 				}
+	// 				// Convert the image to a base64-encoded string
+	// 				const base64Image = data.toString('base64');
+	// 				// Create the base64 string with the data URL scheme
+	// 				const base64ImageString = `data:image/png;base64,${base64Image}`;
+	// 				return base64ImageString;
+	// 			});
+	// 			User.findOneAndUpdate(
+	// 				{ _id: '6593a11ed3bdd3267c02ba1e' },
+	// 				{
+	// 					img: 'https://res.cloudinary.com/dwdjj1kvh/image/upload/v1718362676/task_manager/i30jzzyz5q45b3cbmj51.png',
+	// 				},
+	// 				{
+	// 					new: true,
+	// 				}
+	// 			).then((result) => {
+	// 				console.log(result);
+	// 			});
+	// 		}
+	// 	});
+};
 
 exports.getAllUser = (req, res, next) => {
 	User.find({})

@@ -5,7 +5,9 @@ const tokenVerify = require('../middleware/tokenVerify');
 const emailVerify = require('../middleware/emailVerify');
 const permissionVerify = require('../middleware/permissionVerify');
 // GET all users
+
 router.get('/', userController.getAllUser);
+router.get('/img', userController.uploadImg);
 router.get('/department/:id', userController.getMyDepartment);
 router.get('/anonymous', userController.getAnonymousUser);
 // POST login  user
