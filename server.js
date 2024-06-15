@@ -21,7 +21,7 @@ const notificationRoutes = require('./src/api/routes/Notification');
 const mongoose = require('./src/config/db');
 const io = new Server(server, {
 	cors: {
-		origin: '*',
+		origin: process.env.FE_URL,
 	},
 });
 
@@ -63,6 +63,10 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/calendars', calendarRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/notification', notificationRoutes);
+
+app.get('/socket.io/socket.io.js', (req, res) => {
+	res.sendFile(__dirname + '/node_modules/socket.io/client-dist/socket.io.js');
+});
 // app.use((req, res, next) => {
 // 	const error = new Error('Invalid');
 // 	error.status = 404;
