@@ -22,6 +22,7 @@ const mongoose = require('./src/config/db');
 const io = new Server(server, {
 	cors: {
 		origin: process.env.FE_URL,
+		credentials: true,
 	},
 });
 
