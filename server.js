@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const port = 3001;
+const port = process.env.PORT || 3001;
 const app = express();
 const http = require('http');
 const https = require('https');
