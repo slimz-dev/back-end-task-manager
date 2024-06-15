@@ -17,7 +17,6 @@ const calendarRoutes = require('./src/api/routes/Calendar');
 const emailRoutes = require('./src/api/routes/Email');
 const notificationRoutes = require('./src/api/routes/Notification');
 const mongoose = require('./src/config/db');
-
 const io = new Server(server, {
 	cors: {
 		origin: process.env.FE_URL,

@@ -129,6 +129,7 @@ function updateNotifacation(userId, departmentId, taskId) {
 }
 
 const socketHandler = (socket) => {
+	console.log('connected');
 	socket.on('connect_error', () => {
 		console.log('error connecting to server');
 	});
