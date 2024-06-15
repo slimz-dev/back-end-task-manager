@@ -63,20 +63,23 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/calendars', calendarRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/notification', notificationRoutes);
-app.use((req, res, next) => {
-	const error = new Error('Invalid');
-	error.status = 404;
-	next(error);
-});
+// app.use((req, res, next) => {
+// 	const error = new Error('Invalid');
+// 	error.status = 404;
+// 	next(error);
+// });
 
-app.use((error, req, res, next) => {
-	res.status(error.status || 500);
-	res.json({
-		error: {
-			message: error.message,
-		},
-	});
-});
+// app.use((error, req, res, next) => {
+// 	if (res.headersSent) {
+// 		return next(error);
+// 	}
+// 	res.status(error.status || 500);
+// 	res.json({
+// 		error: {
+// 			message: error.message,
+// 		},
+// 	});
+// });
 
 io.on('connection', socketHandler);
 server.listen(port, () => {
