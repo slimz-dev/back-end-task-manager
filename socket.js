@@ -8,6 +8,7 @@ const { io } = require('./server');
 
 let userState = [];
 let userLoggedIn = {};
+console.log('connecting to socket file');
 User.find({})
 	.then((userList) => {
 		userList.map((user) => {
