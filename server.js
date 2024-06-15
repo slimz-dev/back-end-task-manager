@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const port = process.env.PORT || 3001;
 const app = express();
 const http = require('http');
 const https = require('https');
@@ -65,9 +64,6 @@ app.use('/api/calendars', calendarRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/notification', notificationRoutes);
 
-app.get('/socket.io/socket.io.js', (req, res) => {
-	res.sendFile(__dirname + '/node_modules/socket.io/client-dist/socket.io.js');
-});
 // app.use((req, res, next) => {
 // 	const error = new Error('Invalid');
 // 	error.status = 404;
@@ -87,8 +83,8 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 // });
 
 io.on('connection', socketHandler);
-server.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
+server.listen(process.env.PORT || 3001, () => {
+	console.log(`Example app listening on port ${process.env.PORT || 3001}`);
 });
 
 module.exports = app;
