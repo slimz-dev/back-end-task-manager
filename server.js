@@ -4,8 +4,8 @@ const port = 3001;
 const app = express();
 const http = require('http');
 const https = require('https');
-//const server = http.createServer(app);
-const server = https.createServer(app);
+const server = http.createServer(app);
+// const server = https.createServer(app);
 const { Server } = require('socket.io');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -19,6 +19,7 @@ const calendarRoutes = require('./src/api/routes/Calendar');
 const emailRoutes = require('./src/api/routes/Email');
 const notificationRoutes = require('./src/api/routes/Notification');
 const mongoose = require('./src/config/db');
+console.log(process.env.FE_URL);
 const io = new Server(server, {
 	cors: {
 		origin: process.env.FE_URL,
@@ -47,6 +48,13 @@ app.use((req, res, next) => {
 	next();
 });
 
+app.get('/', (req, res, next) => {
+	res.status(200);
+	res.json({
+		message: 'Back-end server connected successfully !!',
+	});
+	next();
+});
 app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/departments', departmentRoutes);
